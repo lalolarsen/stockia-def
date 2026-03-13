@@ -1,6 +1,16 @@
 import { supabase } from '@/lib/supabase'
 import type { Station, StationType } from '@/types/database'
 
+export async function getAllStations() {
+  const { data, error } = await supabase
+    .from('stations')
+    .select('*, venues(name)')
+    .eq('is_active', true)
+    .order('name')
+  if (error) throw error
+  return data as (Station & { venues: { name: string } })[]
+}
+
 export async function getStations(venueId: string) {
   const { data, error } = await supabase
     .from('stations')

@@ -17,13 +17,14 @@ export async function createVenue(venue: {
   slug: string
   address?: string
 }) {
-  const { data, error } = await supabase
-    .from('venues')
-    .insert(venue)
-    .select()
-    .single()
+  const { data, error } = await supabase.rpc('create_venue', {
+    p_organization_id: venue.organization_id,
+    p_name: venue.name,
+    p_slug: venue.slug,
+    p_address: venue.address ?? null,
+  })
   if (error) throw error
-  return data as Venue
+  return data as string
 }
 
 export async function updateVenue(id: string, updates: Partial<Venue>) {

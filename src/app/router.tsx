@@ -29,6 +29,38 @@ export const router = createBrowserRouter([
         index: true,
         lazy: () => import('@/pages/admin/dashboard'),
       },
+      {
+        path: 'locations',
+        lazy: () => import('@/pages/admin/locations'),
+      },
+      {
+        path: 'workers',
+        lazy: () => import('@/pages/admin/workers'),
+      },
+      {
+        path: 'shifts',
+        lazy: () => import('@/pages/admin/shifts'),
+      },
+      {
+        path: 'stock-items',
+        lazy: () => import('@/pages/admin/stock-items'),
+      },
+      {
+        path: 'catalog',
+        lazy: () => import('@/pages/admin/catalog-items'),
+      },
+      {
+        path: 'recipes',
+        lazy: () => import('@/pages/admin/recipes'),
+      },
+      {
+        path: 'menus',
+        lazy: () => import('@/pages/admin/menus'),
+      },
+      {
+        path: 'inventory',
+        lazy: () => import('@/pages/admin/inventory'),
+      },
     ],
   },
 
@@ -45,6 +77,18 @@ export const router = createBrowserRouter([
         index: true,
         lazy: () => import('@/pages/sales/index'),
       },
+      {
+        path: 'login',
+        lazy: () => import('@/pages/sales/login'),
+      },
+      {
+        path: 'pos',
+        lazy: () => import('@/pages/sales/pos'),
+      },
+      {
+        path: 'tickets',
+        lazy: () => import('@/pages/sales/tickets'),
+      },
     ],
   },
 
@@ -60,6 +104,18 @@ export const router = createBrowserRouter([
       {
         index: true,
         lazy: () => import('@/pages/bar/index'),
+      },
+      {
+        path: 'login',
+        lazy: () => import('@/pages/bar/login'),
+      },
+      {
+        path: 'queue',
+        lazy: () => import('@/pages/bar/queue'),
+      },
+      {
+        path: 'redeem/:code',
+        lazy: () => import('@/pages/bar/redeem'),
       },
     ],
   },

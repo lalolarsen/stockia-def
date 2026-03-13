@@ -1,8 +1,12 @@
+import { Navigate } from 'react-router-dom'
+import { useSalesSession } from '@/hooks/use-sales-session'
+
 export function Component() {
-  return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Portal Ventas</h2>
-      <p className="text-muted-foreground">Punto de venta.</p>
-    </div>
-  )
+  const workerId = useSalesSession((s) => s.workerId)
+
+  if (workerId) {
+    return <Navigate to="/sales/pos" replace />
+  }
+
+  return <Navigate to="/sales/login" replace />
 }
