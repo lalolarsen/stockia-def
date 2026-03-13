@@ -163,27 +163,6 @@ export interface RecipeItem {
   updated_at: string
 }
 
-export interface RecipeOptionGroup {
-  id: string
-  recipe_id: string
-  name: string
-  is_required: boolean
-  min_selections: number
-  max_selections: number
-  created_at: string
-  updated_at: string
-}
-
-export interface RecipeOptionItem {
-  id: string
-  option_group_id: string
-  stock_item_id: string
-  quantity: number
-  label: string
-  created_at: string
-  updated_at: string
-}
-
 export interface Menu {
   id: string
   venue_id: string
@@ -286,14 +265,6 @@ export interface RedemptionItem {
   redemption_id: string
   sale_item_id: string
   recipe_id: string
-  created_at: string
-}
-
-export interface RedemptionItemOption {
-  id: string
-  redemption_item_id: string
-  option_group_id: string
-  option_item_id: string
   created_at: string
 }
 

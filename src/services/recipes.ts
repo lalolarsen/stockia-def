@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import type { Recipe, RecipeItem, RecipeOptionGroup, RecipeOptionItem, StockItem } from '@/types/database'
+import type { Recipe, RecipeItem, StockItem } from '@/types/database'
 
 export async function getRecipes(organizationId: string) {
   const { data, error } = await supabase
@@ -59,51 +59,3 @@ export async function removeRecipeItem(id: string) {
   if (error) throw error
 }
 
-// Option groups
-export async function getOptionGroups(recipeId: string) {
-  const { data, error } = await supabase
-    .from('recipe_option_groups')
-    .select('*')
-    .eq('recipe_id', recipeId)
-  if (error) throw error
-  return data as RecipeOptionGroup[]
-}
-
-export async function createOptionGroup(recipeId: string, name: string, isRequired: boolean) {
-  const { data, error } = await supabase
-    .from('recipe_option_groups')
-    .insert({ recipe_id: recipeId, name, is_required: isRequired })
-    .select()
-    .single()
-  if (error) throw error
-  return data as RecipeOptionGroup
-}
-
-export async function deleteOptionGroup(id: string) {
-  const { error } = await supabase.from('recipe_option_groups').delete().eq('id', id)
-  if (error) throw error
-}
-
-export async function getOptionItems(groupId: string) {
-  const { data, error } = await supabase
-    .from('recipe_option_items')
-    .select('*, stock_items(name, unit)')
-    .eq('option_group_id', groupId)
-  if (error) throw error
-  return data as (RecipeOptionItem & { stock_items: Pick<StockItem, 'name' | 'unit'> })[]
-}
-
-export async function addOptionItem(groupId: string, stockItemId: string, quantity: number, label: string) {
-  const { data, error } = await supabase
-    .from('recipe_option_items')
-    .insert({ option_group_id: groupId, stock_item_id: stockItemId, quantity, label })
-    .select()
-    .single()
-  if (error) throw error
-  return data as RecipeOptionItem
-}
-
-export async function deleteOptionItem(id: string) {
-  const { error } = await supabase.from('recipe_option_items').delete().eq('id', id)
-  if (error) throw error
-}

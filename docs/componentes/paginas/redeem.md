@@ -10,7 +10,6 @@
 - `useMutation`
 
 ## Imports
-- `react`
 - `@tanstack/react-query`
 - `react-router-dom`
 - `@/hooks/use-bar-session`
@@ -18,8 +17,6 @@
 - `@/components/ui/button`
 - `@/components/ui/card`
 - `@/components/ui/badge`
-- `@/components/ui/select`
-- `@/components/ui/label`
 
 ---
 *Generado automáticamente — no editar manualmente*

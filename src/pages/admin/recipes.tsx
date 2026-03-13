@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useVenueContext } from '@/hooks/use-venue-context'
 import { getCatalogItems } from '@/services/catalog-items'
 import { getStockItems } from '@/services/stock-items'
-import { getRecipes, createRecipe, getRecipeItems, addRecipeItem, removeRecipeItem, getOptionGroups, createOptionGroup, deleteOptionGroup, getOptionItems, addOptionItem, deleteOptionItem } from '@/services/recipes'
+import { getRecipes, createRecipe, getRecipeItems, addRecipeItem, removeRecipeItem } from '@/services/recipes'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,7 +18,6 @@ function RecipeDetail({ recipe }: { recipe: Recipe }) {
   const queryClient = useQueryClient()
   const [stockItemId, setStockItemId] = useState('')
   const [qty, setQty] = useState('')
-  const [groupName, setGroupName] = useState('')
 
   const { data: stockItems } = useQuery({
     queryKey: ['stock-items', organizationId],
@@ -29,11 +28,6 @@ function RecipeDetail({ recipe }: { recipe: Recipe }) {
   const { data: items } = useQuery({
     queryKey: ['recipe-items', recipe.id],
     queryFn: () => getRecipeItems(recipe.id),
-  })
-
-  const { data: groups } = useQuery({
-    queryKey: ['option-groups', recipe.id],
-    queryFn: () => getOptionGroups(recipe.id),
   })
 
   const addItemMut = useMutation({
@@ -49,115 +43,30 @@ function RecipeDetail({ recipe }: { recipe: Recipe }) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['recipe-items', recipe.id] }),
   })
 
-  const addGroupMut = useMutation({
-    mutationFn: () => createOptionGroup(recipe.id, groupName, true),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['option-groups', recipe.id] })
-      setGroupName('')
-    },
-  })
-
-  const delGroupMut = useMutation({
-    mutationFn: deleteOptionGroup,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['option-groups', recipe.id] }),
-  })
-
   return (
-    <div className="space-y-4">
-      {/* Recipe items (fixed ingredients) */}
-      <div>
-        <p className="text-sm font-medium mb-2">Ingredientes fijos</p>
-        {items?.map((item) => (
-          <div key={item.id} className="flex items-center justify-between rounded border p-2 mb-1">
-            <span className="text-sm">{item.stock_items.name} — {Number(item.quantity)} {item.stock_items.unit}</span>
-            <Button size="sm" variant="ghost" onClick={() => removeItemMut.mutate(item.id)}>×</Button>
-          </div>
-        ))}
-        <div className="flex gap-2 mt-2">
-          <Select value={stockItemId} onValueChange={(v) => { if (v) setStockItemId(v as string) }}>
-            <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Stock item..." />
-            </SelectTrigger>
-            <SelectContent>
-              {stockItems?.map((si) => (
-                <SelectItem key={si.id} value={si.id}>{si.name} ({si.unit})</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Input type="number" placeholder="Cant." value={qty} onChange={(e) => setQty(e.target.value)} className="w-24" />
-          <Button size="sm" disabled={!stockItemId || !qty} onClick={() => addItemMut.mutate()}>+</Button>
+    <div>
+      <p className="text-sm font-medium mb-2">Ingredientes</p>
+      {items?.map((item) => (
+        <div key={item.id} className="flex items-center justify-between rounded border p-2 mb-1">
+          <span className="text-sm">{item.stock_items.name} — {Number(item.quantity)} {item.stock_items.unit}</span>
+          <Button size="sm" variant="ghost" onClick={() => removeItemMut.mutate(item.id)}>×</Button>
         </div>
-      </div>
-
-      {/* Option groups (e.g., mixer selection) */}
-      <div>
-        <p className="text-sm font-medium mb-2">Grupos de opciones (mixer, etc.)</p>
-        {groups?.map((group) => (
-          <OptionGroupDetail key={group.id} group={group} stockItems={stockItems ?? []} onDelete={() => delGroupMut.mutate(group.id)} />
-        ))}
-        <div className="flex gap-2 mt-2">
-          <Input placeholder="Nombre grupo (ej: Mixer)" value={groupName} onChange={(e) => setGroupName(e.target.value)} className="flex-1" />
-          <Button size="sm" disabled={!groupName} onClick={() => addGroupMut.mutate()}>+ Grupo</Button>
-        </div>
+      ))}
+      <div className="flex gap-2 mt-2">
+        <Select value={stockItemId} onValueChange={(v) => { if (v) setStockItemId(v as string) }}>
+          <SelectTrigger className="flex-1">
+            <SelectValue placeholder="Stock item..." />
+          </SelectTrigger>
+          <SelectContent>
+            {stockItems?.map((si) => (
+              <SelectItem key={si.id} value={si.id}>{si.name} ({si.unit})</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Input type="number" placeholder="Cant." value={qty} onChange={(e) => setQty(e.target.value)} className="w-24" />
+        <Button size="sm" disabled={!stockItemId || !qty} onClick={() => addItemMut.mutate()}>+</Button>
       </div>
     </div>
-  )
-}
-
-function OptionGroupDetail({ group, stockItems, onDelete }: { group: { id: string; name: string }; stockItems: { id: string; name: string; unit: string }[]; onDelete: () => void }) {
-  const queryClient = useQueryClient()
-  const [stockId, setStockId] = useState('')
-  const [qty, setQty] = useState('')
-  const [label, setLabel] = useState('')
-
-  const { data: optItems } = useQuery({
-    queryKey: ['option-items', group.id],
-    queryFn: () => getOptionItems(group.id),
-  })
-
-  const addMut = useMutation({
-    mutationFn: () => addOptionItem(group.id, stockId, Number(qty), label),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['option-items', group.id] })
-      setStockId(''); setQty(''); setLabel('')
-    },
-  })
-
-  const delMut = useMutation({
-    mutationFn: deleteOptionItem,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['option-items', group.id] }),
-  })
-
-  return (
-    <Card className="mb-2">
-      <CardHeader className="py-2 px-3 flex flex-row items-center justify-between">
-        <CardTitle className="text-sm">{group.name}</CardTitle>
-        <Button size="sm" variant="ghost" onClick={onDelete}>×</Button>
-      </CardHeader>
-      <CardContent className="px-3 pb-3">
-        {optItems?.map((oi) => (
-          <div key={oi.id} className="flex items-center justify-between rounded border p-1.5 mb-1 text-sm">
-            <span>{oi.label} — {Number(oi.quantity)} {oi.stock_items.unit}</span>
-            <Button size="sm" variant="ghost" onClick={() => delMut.mutate(oi.id)}>×</Button>
-          </div>
-        ))}
-        <div className="flex gap-1 mt-1">
-          <Select value={stockId} onValueChange={(v) => { if (v) setStockId(v as string) }}>
-            <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Item..." />
-            </SelectTrigger>
-            <SelectContent>
-              {stockItems.map((si) => (
-                <SelectItem key={si.id} value={si.id}>{si.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Input placeholder="Cant." type="number" value={qty} onChange={(e) => setQty(e.target.value)} className="w-16" />
-          <Input placeholder="Label" value={label} onChange={(e) => setLabel(e.target.value)} className="w-24" />
-          <Button size="sm" disabled={!stockId || !qty || !label} onClick={() => addMut.mutate()}>+</Button>
-        </div>
-      </CardContent>
-    </Card>
   )
 }
 

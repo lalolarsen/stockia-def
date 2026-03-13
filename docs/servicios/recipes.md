@@ -5,8 +5,6 @@
 ## Tablas de Supabase
 - [[recipes]]
 - [[recipe_items]]
-- [[recipe_option_groups]]
-- [[recipe_option_items]]
 
 ## Funciones exportadas
 - `getRecipes()`
@@ -15,12 +13,6 @@
 - `getRecipeItems()`
 - `addRecipeItem()`
 - `removeRecipeItem()`
-- `getOptionGroups()`
-- `createOptionGroup()`
-- `deleteOptionGroup()`
-- `getOptionItems()`
-- `addOptionItem()`
-- `deleteOptionItem()`
 
 ## Operaciones
 - `select`
